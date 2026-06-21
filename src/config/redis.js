@@ -3,9 +3,7 @@ const logger = require('../utils/logger');
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
-/**
- * Primary Redis client for commands (GET, SET, SADD, etc.)
- */
+// Main client for cache/data operations
 const redis = new Redis(redisUrl, {
   maxRetriesPerRequest: 3,
   retryDelayOnFailover: 300,
@@ -20,10 +18,7 @@ redis.on('error', (err) => {
   logger.error('Redis client error', { error: err.message });
 });
 
-/**
- * Separate Redis client for Pub/Sub subscriptions.
- * A subscribed client cannot issue regular commands.
- */
+// Dedicated subscriber; subscribed clients can't run normal commands
 const redisSub = new Redis(redisUrl, {
   maxRetriesPerRequest: 3,
   lazyConnect: false,
@@ -37,10 +32,7 @@ redisSub.on('error', (err) => {
   logger.error('Redis subscriber error', { error: err.message });
 });
 
-/**
- * Publisher client — separate from the main client so pub/sub
- * doesn't interfere with regular commands.
- */
+// Separate publisher so pub/sub doesn't block the main client
 const redisPub = new Redis(redisUrl, {
   maxRetriesPerRequest: 3,
   lazyConnect: false,

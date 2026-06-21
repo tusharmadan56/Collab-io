@@ -16,12 +16,7 @@ pool.on('connect', () => {
   logger.info('New PostgreSQL client connected');
 });
 
-/**
- * Execute a parameterized query against the pool.
- * @param {string} text - SQL query string
- * @param {Array} params - Query parameters
- * @returns {Promise<import('pg').QueryResult>}
- */
+// Wrapper that logs query duration and errors for observability
 const query = async (text, params) => {
   const start = Date.now();
   try {
@@ -35,10 +30,7 @@ const query = async (text, params) => {
   }
 };
 
-/**
- * Get a client from the pool for transactions.
- * @returns {Promise<import('pg').PoolClient>}
- */
+// Use getClient() when you need transactions (BEGIN/COMMIT)
 const getClient = async () => {
   return pool.connect();
 };
