@@ -68,3 +68,16 @@ CREATE TABLE IF NOT EXISTS document_history (
 
 CREATE INDEX idx_document_history_document_id ON document_history(document_id);
 CREATE INDEX idx_document_history_timestamp ON document_history(timestamp DESC);
+
+-- Refresh tokens stored in DB so they can be revoked (unlike stateless access tokens)
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(512) NOT NULL UNIQUE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_refresh_tokens_token ON refresh_tokens(token);
+CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+
